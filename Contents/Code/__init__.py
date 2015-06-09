@@ -1,5 +1,4 @@
-import putio
-
+import putio2 as putio
 
 NAME = 'Put.io'
 
@@ -30,6 +29,7 @@ def ParseDirectory(id, name):
     oc.add(PrefsObject(title = L('Preferences')))
     
     token = Prefs['access_token']
+    Log.Info(token)
     if token == "":
         return ObjectContainer(header="Login", message="Enter your access token in Preferences.")
     
@@ -72,9 +72,11 @@ def Lookup(id):
     id = int(id)
     
     client = putio.Client(Prefs['access_token'])
-    f = client.File.get(id)
+    f = client.File.GET(id)
     
     if f.content_type.startswith('video/'):
+        Log.Info(f.subtitles())
+
         oc.add(VideoClipObject(
             key=Callback(Lookup, id=f.id),
             items=[MediaObject(parts=[PartObject(key=Callback(PlayMedia, url=f.stream_url))])],
@@ -98,4 +100,5 @@ def Lookup(id):
 
 @route('/video/putio/play')
 def PlayMedia(url):
+    Log.Info("Redirecting to %s", url)
     return Redirect(url)
